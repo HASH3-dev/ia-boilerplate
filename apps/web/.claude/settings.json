@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(git *)",
+      "Bash(npx playwright *)",
+      "Bash(playwright-cli:*)",
+      "Read(./src/**)",
+      "Read(./messages/**)",
+      "Read(./public/**)",
+      "Read(./package.json)",
+      "Read(./next.config.ts)",
+      "Read(./tsconfig.json)",
+      "Read(./components.json)",
+      "Read(/home/jaykon/.claude/**)",
+      "Edit(/.claude/**)",
+      "Skill(playwright-cli)",
+      "Skill(playwright-cli:*)"
+    ],
+    "deny": [
+      "Read(.env*)",
+      "Read(./**/*.env)",
+      "Bash(rm -rf *)",
+      "Bash(npm uninstall *)"
+    ],
+    "additionalDirectories": []
+  }
+}

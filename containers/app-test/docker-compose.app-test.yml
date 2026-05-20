@@ -1,0 +1,101 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: genemunology-app-test-postgres
+    environment:
+      POSTGRES_DB: genemunology_app_test
+      POSTGRES_USER: genemunology
+      POSTGRES_PASSWORD: genemunology
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U genemunology -d genemunology_app_test"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: genemunology-app-test-mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+  api:
+    build:
+      context: ../..
+      dockerfile: containers/app-test/api/Dockerfile
+    container_name: genemunology-app-test-api
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DB_URI: postgresql://genemunology:genemunology@postgres:5432/genemunology_app_test
+      DB_SCHEMA: public
+      BACKEND_JWT_SECRET: ${BACKEND_JWT_SECRET:-app-test-backend-jwt-secret-change-me}
+      FIREBASE_ADMIN_CREDENTIALS_JSON: ${FIREBASE_ADMIN_CREDENTIALS_JSON}
+      THROTTLE_LIMIT_REQUEST_OTP: "1000"
+      EMAIL_TRANSPORT: smtp
+      SMTP_HOST: mailpit
+      SMTP_PORT: 1025
+      SMTP_FROM: noreply@genemunology-test.local
+      ALLOWED_ORIGINS: http://web:3000,http://localhost:3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:3001/ || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 15s
+
+  web:
+    build:
+      context: ../..
+      dockerfile: containers/app-test/web/Dockerfile
+      args:
+        NEXT_PUBLIC_FIREBASE_CONFIG: ${NEXT_PUBLIC_FIREBASE_CONFIG}
+    container_name: genemunology-app-test-web
+    environment:
+      FIREBASE_ADMIN_CONFIG: ${FIREBASE_ADMIN_CONFIG}
+      BACKEND_API_BASE_URL: http://api:3001
+      PORT: 3000
+      NEXTAUTH_URL: http://web:3000
+      CHECK_TOKEN_REVOCATION: "false"
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "${APP_TEST_WEB_PORT:-3000}:3000"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:3000 || exit 1"]
+      interval: 5s
+      timeout: 10s
+      retries: 30
+      start_period: 30s
+
+  web-vitest:
+    build:
+      context: ../..
+      dockerfile: containers/app-test/web/Dockerfile
+      args:
+        NEXT_PUBLIC_FIREBASE_CONFIG: ${NEXT_PUBLIC_FIREBASE_CONFIG}
+    container_name: genemunology-app-test-web-vitest
+    working_dir: /workspace/apps/web
+    command: ["npm", "run", "test"]
+
+  playwright:
+    build:
+      context: ../..
+      dockerfile: containers/app-test/playwright/Dockerfile
+    container_name: genemunology-app-test-playwright
+    environment:
+      BASE_URL: http://web:3000
+      MAILPIT_URL: http://mailpit:8025
+      TEST_USER_EMAIL: ${TEST_USER_EMAIL}
+      TEST_USER_PASSWORD: ${TEST_USER_PASSWORD}
+    depends_on:
+      web:
+        condition: service_healthy

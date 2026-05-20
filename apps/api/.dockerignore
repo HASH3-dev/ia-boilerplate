@@ -1,0 +1,11 @@
+.git
+.codex
+.env
+.cert
+credentials
+dist
+node_modules
+coverage
+.nyc_output
+logs
+*.log

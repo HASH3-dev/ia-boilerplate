@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(source ~/.asdf/asdf.sh && npm run *)",
+      "Bash(npm run *)",
+      "Bash(git *)",
+      "Read(./apps/**)",
+      "Read(./packages/**)",
+      "Read(./.claude/**)",
+      "Read(/home/jaykon/.claude/**)",
+      "Edit(/.claude/**)",
+      "Edit(/.claude/skills/task/**)"
+    ],
+    "deny": [
+      "Read(.env*)",
+      "Read(./**/*.env)",
+      "Bash(rm -rf *)",
+      "Bash(npm uninstall *)"
+    ],
+    "additionalDirectories": [
+      "/home/jaykon/dev/my/genemunology-monorepo/apps/api/.claude/skills"
+    ]
+  }
+}

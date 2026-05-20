@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(source ~/.asdf/asdf.sh && npm run *)",
+      "Bash(npm run *)",
+      "Bash(git *)",
+      "Read(./src/**)",
+      "Read(./migrations/**)",
+      "Read(./test/**)",
+      "Read(//home/jaykon/.claude/**)",
+      "Edit(/.claude/skills/new-module/**)",
+      "Edit(/.claude/skills/task/**)",
+      "Skill(playwright-cli)",
+      "Skill(playwright-cli:*)"
+    ],
+    "deny": [
+      "Read(.env*)",
+      "Read(./**/*.env)",
+      "Bash(rm -rf *)",
+      "Bash(npm uninstall *)"
+    ],
+    "additionalDirectories": [
+      "/home/jaykon/dev/my/genemunology-api/.claude/skills"
+    ]
+  }
+}

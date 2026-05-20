@@ -1,0 +1,53 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: genemunology-dev-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-genemunology_dev}
+      POSTGRES_USER: ${POSTGRES_USER:-genemunology}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-genemunology}
+    volumes:
+      - dev_postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-genemunology} -d ${POSTGRES_DB:-genemunology_dev}"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  api:
+    build:
+      context: ../..
+      dockerfile: containers/app-test/api/Dockerfile
+    container_name: genemunology-dev-api
+    environment:
+      NODE_ENV: develop
+      PORT: 3001
+      DB_URI: postgresql://${POSTGRES_USER:-genemunology}:${POSTGRES_PASSWORD:-genemunology}@postgres:5432/${POSTGRES_DB:-genemunology_dev}
+      DB_SCHEMA: public
+      BACKEND_JWT_SECRET: ${BACKEND_JWT_SECRET}
+      BACKEND_ACCESS_TOKEN_TTL_SECONDS: ${BACKEND_ACCESS_TOKEN_TTL_SECONDS:-600}
+      BACKEND_REFRESH_TOKEN_TTL_DAYS: ${BACKEND_REFRESH_TOKEN_TTL_DAYS:-30}
+      OTP_MAX_ATTEMPTS: ${OTP_MAX_ATTEMPTS:-5}
+      THROTTLE_LIMIT_REQUEST_OTP: ${THROTTLE_LIMIT_REQUEST_OTP:-5}
+      FIREBASE_ADMIN_CREDENTIALS_JSON: ${FIREBASE_ADMIN_CREDENTIALS_JSON}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL}
+      ALLOWED_ORIGINS: http://localhost:3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "3001:3001"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:3001/ || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 15s
+
+volumes:
+  dev_postgres_data:

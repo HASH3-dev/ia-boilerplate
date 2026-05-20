@@ -1,0 +1,4 @@
+interface:
+  display_name: "Resolve Issues"
+  short_description: "Resolve open issues from a task issues.md with tests."
+  default_prompt: "Resolve the open issues for task <task-folder-name>."
