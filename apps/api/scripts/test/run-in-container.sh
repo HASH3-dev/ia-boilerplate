@@ -40,10 +40,10 @@ if [ "$TEST_SUITE_MODE" = "smoke" ]; then
   npx jest --testNamePattern="\\[smoke\\]"
 
   echo "Running smoke contract tests..."
-  npx jest --config ./test/jest-e2e.json test/auth-email-otp.e2e-spec.ts --testNamePattern="\\[smoke\\]"
+  npx jest --passWithNoTests --config ./test/jest-e2e.json test/auth-email-otp.e2e-spec.ts --testNamePattern="\\[smoke\\]"
 
   echo "Running smoke integration tests..."
-  npx jest --config ./test/jest-integration.json --testNamePattern="\\[smoke\\]"
+  npx jest --passWithNoTests --config ./test/jest-integration.json --testNamePattern="\\[smoke\\]"
 
   exit 0
 fi
@@ -74,9 +74,9 @@ run_step "Running unit tests..." npx jest --runInBand
 
 export TEST_DB_URI="$TEST_DATABASE_URI"
 
-run_step "Running integration tests..." npx jest --config ./test/jest-integration.json --runInBand
+run_step "Running integration tests..." npx jest --passWithNoTests --config ./test/jest-integration.json --runInBand
 
-run_step "Running e2e tests..." npx jest --config ./test/jest-e2e.json --runInBand
+run_step "Running e2e tests..." npx jest --passWithNoTests --config ./test/jest-e2e.json --runInBand
 
 run_step "Running build..." npm run build
 

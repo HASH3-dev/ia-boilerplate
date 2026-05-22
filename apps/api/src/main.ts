@@ -64,9 +64,13 @@ async function bootstrap() {
   buildSwagger(app);
 
   await app.listen(process.env.PORT || 3000);
-  console.log(`Application is running on: http://localhost:${process.env.PORT || 3000}`);
+  console.log(
+    `Application is running on: http://localhost:${process.env.PORT || 3000}`,
+  );
   if (process.env.NODE_ENV === 'develop') {
-    console.log(`Swagger docs: http://localhost:${process.env.PORT || 3000}/docs`);
+    console.log(
+      `Swagger docs: http://localhost:${process.env.PORT || 3000}/docs`,
+    );
   }
 }
 

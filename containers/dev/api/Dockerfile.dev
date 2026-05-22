@@ -1,0 +1,18 @@
+FROM node:24-alpine
+
+WORKDIR /workspace
+
+RUN apk add --no-cache curl
+
+# Pre-install deps so node_modules exist in the image layer.
+# At runtime the workspace is bind-mounted, but node_modules is shadowed
+# by a named volume pointing to this layer — giving hot-reload without
+# host/container node_modules conflicts.
+COPY package.json package-lock.json ./
+COPY apps/api/package.json ./apps/api/
+COPY apps/web/package.json ./apps/web/
+RUN npm ci
+
+WORKDIR /workspace/apps/api
+EXPOSE 3001
+CMD ["sh", "-c", "npm run migrate:latest && npm run start:dev"]

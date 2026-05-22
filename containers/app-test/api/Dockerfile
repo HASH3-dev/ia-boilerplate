@@ -1,10 +1,8 @@
-FROM node:24.11.1-bookworm-slim
+FROM node:24-alpine
 
 WORKDIR /workspace
 
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends curl postgresql-client \
-  && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache curl postgresql-client
 
 # Cache npm install layer — copy all workspace manifests before source
 COPY package.json package-lock.json ./

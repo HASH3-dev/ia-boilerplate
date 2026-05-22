@@ -1,0 +1,14 @@
+FROM node:24-alpine
+
+WORKDIR /workspace
+
+RUN apk add --no-cache curl
+
+COPY package.json package-lock.json ./
+COPY apps/api/package.json ./apps/api/
+COPY apps/web/package.json ./apps/web/
+RUN npm ci
+
+WORKDIR /workspace/apps/web
+EXPOSE 3000
+CMD ["npm", "run", "dev"]

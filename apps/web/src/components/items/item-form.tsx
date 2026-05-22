@@ -3,7 +3,14 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import type { Item } from '@/types/item';
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from '@/components/ui/form';
 
 const itemSchema = z.object({
   title: z.string().min(1, 'Title is required').max(255),
@@ -19,57 +26,63 @@ interface ItemFormProps {
   submitLabel?: string;
 }
 
-export function ItemForm({
-  defaultValues,
-  onSubmit,
-  isLoading,
-  submitLabel = 'Save',
-}: ItemFormProps) {
-  const { register, handleSubmit, formState: { errors } } = useForm<ItemFormValues>({
+export function ItemForm({ defaultValues, onSubmit, isLoading, submitLabel = 'Save' }: ItemFormProps) {
+  const form = useForm<ItemFormValues>({
     resolver: zodResolver(itemSchema),
     defaultValues,
   });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div>
-        <label htmlFor="title" className="block text-sm font-medium mb-1">
-          Title
-        </label>
-        <input
-          id="title"
-          {...register('title')}
-          className="w-full border rounded px-3 py-2 text-sm"
-          placeholder="Item title"
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Title</FormLabel>
+              <FormControl>
+                <input
+                  {...field}
+                  className="w-full rounded-lg border bg-card px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground shadow-sm outline-none focus:ring-2 focus:ring-ring/40 transition-shadow"
+                  placeholder="Item title"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.title && (
-          <p className="text-destructive text-sm mt-1">{errors.title.message}</p>
-        )}
-      </div>
 
-      <div>
-        <label htmlFor="description" className="block text-sm font-medium mb-1">
-          Description
-        </label>
-        <textarea
-          id="description"
-          {...register('description')}
-          className="w-full border rounded px-3 py-2 text-sm"
-          rows={4}
-          placeholder="Optional description"
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Description
+                <span className="ml-1 text-muted-foreground font-normal">(optional)</span>
+              </FormLabel>
+              <FormControl>
+                <textarea
+                  {...field}
+                  className="w-full rounded-lg border bg-card px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground shadow-sm outline-none focus:ring-2 focus:ring-ring/40 transition-shadow resize-none"
+                  rows={4}
+                  placeholder="Optional description"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.description && (
-          <p className="text-destructive text-sm mt-1">{errors.description.message}</p>
-        )}
-      </div>
 
-      <button
-        type="submit"
-        disabled={isLoading}
-        className="bg-primary text-primary-foreground rounded px-4 py-2 text-sm font-medium disabled:opacity-50"
-      >
-        {isLoading ? 'Saving...' : submitLabel}
-      </button>
-    </form>
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="rounded-lg bg-primary text-primary-foreground px-5 py-2.5 text-sm font-medium shadow-sm hover:opacity-90 disabled:opacity-50 transition-opacity"
+        >
+          {isLoading ? 'Saving…' : submitLabel}
+        </button>
+      </form>
+    </Form>
   );
 }

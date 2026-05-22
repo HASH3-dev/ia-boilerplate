@@ -1,14 +1,10 @@
 {
   "name": "my-project-monorepo",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "workspaces": [
     "apps/*"
   ],
-  "overrides": {
-    "motion-dom": "12.18.1",
-    "motion-utils": "12.18.1"
-  },
   "scripts": {
     "dev:web": "npm run dev --workspace apps/web",
     "dev:api": "npm run start:dev --workspace apps/api",
@@ -29,11 +25,9 @@
     "start:api": "npm run start:prod --workspace apps/api",
     "test:app:full": "bash scripts/test-app-full.sh",
     "test:app:headed": "bash scripts/test-app-headed.sh",
-    "dev:backend": "docker compose -f containers/dev-backend/docker-compose.dev-backend.yml --env-file containers/dev-backend/.env up -d",
-    "dev:backend:down": "docker compose -f containers/dev-backend/docker-compose.dev-backend.yml down"
-  },
-  "dependencies": {
-    "motion-dom": "12.18.1",
-    "motion-utils": "12.18.1"
+    "dev": "docker compose -f containers/dev/docker-compose.dev.yml up",
+    "dev:build": "docker compose -f containers/dev/docker-compose.dev.yml build",
+    "dev:down": "docker compose -f containers/dev/docker-compose.dev.yml down",
+    "dev:down:volumes": "docker compose -f containers/dev/docker-compose.dev.yml down -v"
   }
 }

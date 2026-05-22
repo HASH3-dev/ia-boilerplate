@@ -8,6 +8,6 @@ export class ListItemsHandler {
 
   async handle(): Promise<ItemResponseDto[]> {
     const items = await this.itemRepository.findAll();
-    return items.map(ItemResponseDto.fromEntity);
+    return items.map((item) => ItemResponseDto.fromEntity(item));
   }
 }

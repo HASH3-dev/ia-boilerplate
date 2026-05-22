@@ -7,7 +7,10 @@ import { ItemResponseDto } from '@entrypoints/items/dto/item.response.dto';
 export class UpdateItemHandler {
   constructor(private readonly itemRepository: ItemRepository) {}
 
-  async handle(id: string, dto: UpdateItemRequestDto): Promise<ItemResponseDto> {
+  async handle(
+    id: string,
+    dto: UpdateItemRequestDto,
+  ): Promise<ItemResponseDto> {
     const item = await this.itemRepository.update(id, dto);
     if (!item) throw new NotFoundException('Item not found');
     return ItemResponseDto.fromEntity(item);

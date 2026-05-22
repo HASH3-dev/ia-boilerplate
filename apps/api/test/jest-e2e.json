@@ -1,0 +1,15 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testRegex": ".e2e-spec.ts$",
+  "moduleNameMapper": {
+    "^@ports/(.*)$": "<rootDir>/../src/ports/$1",
+    "^@shared/(.*)$": "<rootDir>/../src/shared/$1",
+    "^@repositories/(.*)$": "<rootDir>/../src/repositories/$1",
+    "^@entrypoints/(.*)$": "<rootDir>/../src/entrypoints/$1"
+  },
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  }
+}

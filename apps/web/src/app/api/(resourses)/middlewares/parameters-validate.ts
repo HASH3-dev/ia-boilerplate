@@ -2,23 +2,16 @@ import { RouterError } from "@resources/errors/router-error";
 import { createMiddleware } from "@resources/helpers/create-middleware";
 import z from "zod";
 
-export const parametersValidate = <
-  R extends z.infer<T>,
-  T extends z.ZodType = z.ZodType,
->(
-  param: string,
-  zodSchema: T,
-  transform: (value: unknown) => R = (v) => v as R,
-) =>
+export const parametersValidate = <T extends z.ZodType>(zodSchema: T) =>
   createMiddleware(async (_, { params }) => {
-    const val = (await params)[param];
+    const val = await params;
 
     try {
-      return transform(zodSchema.parse(val)) as R;
+      return zodSchema.parse(val) as z.infer<T>;
     } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         throw new RouterError({
-          message: "Invalid route parameter: " + param,
+          message: "Invalid route parameters",
           status: 400,
           details: error.issues,
         });

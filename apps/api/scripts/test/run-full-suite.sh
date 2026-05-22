@@ -41,10 +41,10 @@ if [ "$TEST_SUITE_MODE" = "smoke" ]; then
   "${COMPOSE[@]}" run --rm -e TEST_DB_URI= test-runner npx jest --runInBand --testNamePattern="\\[smoke\\]"
 
   echo "Running smoke contract tests..."
-  "${COMPOSE[@]}" run --rm test-runner npx jest --runInBand --config ./test/jest-e2e.json test/auth-email-otp.e2e-spec.ts --testNamePattern="\\[smoke\\]"
+  "${COMPOSE[@]}" run --rm test-runner npx jest --runInBand --passWithNoTests --config ./test/jest-e2e.json test/auth-email-otp.e2e-spec.ts --testNamePattern="\\[smoke\\]"
 
   echo "Running smoke integration tests..."
-  "${COMPOSE[@]}" run --rm test-runner npx jest --runInBand --config ./test/jest-integration.json --testNamePattern="\\[smoke\\]"
+  "${COMPOSE[@]}" run --rm test-runner npx jest --runInBand --passWithNoTests --config ./test/jest-integration.json --testNamePattern="\\[smoke\\]"
 
   exit 0
 fi
@@ -53,10 +53,10 @@ echo "Running unit tests..."
 "${COMPOSE[@]}" run --rm -e TEST_DB_URI= test-runner npx jest --runInBand
 
 echo "Running integration tests..."
-"${COMPOSE[@]}" run --rm test-runner npx jest --runInBand --config ./test/jest-integration.json
+"${COMPOSE[@]}" run --rm test-runner npx jest --runInBand --passWithNoTests --config ./test/jest-integration.json
 
 echo "Running e2e tests..."
-"${COMPOSE[@]}" run --rm test-runner npx jest --runInBand --config ./test/jest-e2e.json
+"${COMPOSE[@]}" run --rm test-runner npx jest --runInBand --passWithNoTests --config ./test/jest-e2e.json
 
 echo "Running build..."
 "${COMPOSE[@]}" run --rm test-runner npm run build

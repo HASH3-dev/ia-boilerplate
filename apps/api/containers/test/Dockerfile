@@ -1,12 +1,10 @@
-FROM node:24.11.1-bookworm-slim
+FROM node:24-alpine
 
 WORKDIR /workspace
 
 ENV NODE_ENV=test
 
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends postgresql-client \
-  && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache postgresql-client bash
 
 COPY package.json package-lock.json ./
 COPY apps/api/package.json ./apps/api/

@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { KnexModule } from 'nestjs-knex';
 import { RepositoriesModule } from './repositories/repositories.module';
+import { HealthModule } from './entrypoints/health/health.module';
 import { ItemsModule } from './entrypoints/items/items.module';
 
 @Module({
@@ -19,6 +20,7 @@ import { ItemsModule } from './entrypoints/items/items.module';
       },
     }),
     RepositoriesModule,
+    HealthModule,
     ItemsModule,
   ],
 })

@@ -1,0 +1,70 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ai_boilerplate-dev-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-ai_boilerplate_dev}
+      POSTGRES_USER: ${POSTGRES_USER:-ai_boilerplate}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ai_boilerplate}
+    volumes:
+      - dev_postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ai_boilerplate} -d ${POSTGRES_DB:-ai_boilerplate_dev}"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  api:
+    build:
+      context: ../..
+      dockerfile: containers/dev/api/Dockerfile.dev
+    container_name: ai_boilerplate-dev-api
+    env_file:
+      - ../../apps/api/.env
+    environment:
+      # Overrides only what changes inside Docker: DB host is the service name,
+      # not localhost as in the local .env.
+      DB_URI: postgresql://${POSTGRES_USER:-ai_boilerplate}:${POSTGRES_PASSWORD:-ai_boilerplate}@postgres:5432/${POSTGRES_DB:-ai_boilerplate_dev}
+    volumes:
+      # Bind-mount the full workspace so every file edit reflects immediately.
+      # The three named volumes below shadow node_modules directories so the
+      # container keeps its own installed packages independent of the host.
+      - ../..:/workspace
+      - dev_root_node_modules:/workspace/node_modules
+      - dev_api_node_modules:/workspace/apps/api/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "3001:3001"
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ../..
+      dockerfile: containers/dev/web/Dockerfile.dev
+    container_name: ai_boilerplate-dev-web
+    env_file:
+      - ../../apps/web/.env
+    environment:
+      # Server-side calls (SSR/API routes) run inside Docker, so the API host
+      # must be the service name, not localhost.
+      BACKEND_API_BASE_URL: http://api:3001
+    volumes:
+      - ../..:/workspace
+      - dev_root_node_modules:/workspace/node_modules
+      - dev_web_node_modules:/workspace/apps/web/node_modules
+    depends_on:
+      - api
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+volumes:
+  dev_postgres_data:
+  dev_root_node_modules:
+  dev_api_node_modules:
+  dev_web_node_modules:

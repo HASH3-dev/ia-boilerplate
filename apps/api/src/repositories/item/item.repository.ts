@@ -9,12 +9,19 @@ export class ItemRepository extends BaseAbstractRepository {
   }
 
   async findAll(): Promise<Item[]> {
-    const records = await this.knex.select('*').from('items').orderBy('created_at', 'desc');
+    const records = await this.knex
+      .select('*')
+      .from('items')
+      .orderBy('created_at', 'desc');
     return records.map((r) => this.itemFactory(r));
   }
 
   async findById(id: string): Promise<Item | null> {
-    const record = await this.knex.select('*').from('items').where('id', id).first();
+    const record = await this.knex
+      .select('*')
+      .from('items')
+      .where('id', id)
+      .first();
     return this.itemFactory(record);
   }
 
@@ -25,7 +32,10 @@ export class ItemRepository extends BaseAbstractRepository {
     return this.itemFactory(record);
   }
 
-  async update(id: string, data: { title?: string; description?: string }): Promise<Item | null> {
+  async update(
+    id: string,
+    data: { title?: string; description?: string },
+  ): Promise<Item | null> {
     const [record] = await this.knex('items')
       .where('id', id)
       .update({ ...data, updated_at: this.knex.fn.now() })
@@ -38,7 +48,9 @@ export class ItemRepository extends BaseAbstractRepository {
     return count > 0;
   }
 
-  private itemFactory(record: Record<string, unknown> | null | undefined): Item {
+  private itemFactory(
+    record: Record<string, unknown> | null | undefined,
+  ): Item {
     if (!record) return null as unknown as Item;
     return {
       id: record.id as string,

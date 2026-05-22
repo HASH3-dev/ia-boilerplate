@@ -96,43 +96,35 @@ If `npm run test:full` exits 0:
 - Report only that the full test suite passed.
 - Continue to architecture-validator.
 
-### Validation agent failures
+### Validation agent failures — auto-resolution loop
 
 After each validation agent (architecture-validator and security-auditor), evaluate the results **before** proceeding to the next step.
 
-### If any Critical or High issues are found:
+#### If any Critical or High issues are found:
 
-**You MUST:**
+**Execute this loop automatically — no user interaction required:**
 
-1. **Invoke the `/log-issue` skill**, passing all critical/high findings. The skill will locate the task folder from the current branch, determine the next issue number, and create individual `issue-NNN.md` files — one per finding.
+1. **Invoke `/log-issue`**, passing all critical/high findings. The skill creates individual `issue-NNN.md` files in the task issues folder.
 
-2. **Stop the workflow immediately.** Do NOT proceed to the next agent.
+2. **Invoke `/resolve-issues`** immediately after logging. The skill reads the open issue files and delegates fixes to the `software-engineer` agent.
 
-3. **Inform the user** with this exact message structure:
+3. **Re-run the full validation sequence** from Step 2 (`npm run check` → `npm run test:full` → `architecture-validator` → `security-auditor`).
 
-   ```
-   ## ⛔ Commit interrompido
+4. **Repeat** this loop until no Critical or High issues remain.
 
-   Foram encontrados [N] problema(s) bloqueante(s) durante a validação de [arquitetura / segurança].
+5. Only after the loop exits clean, proceed to `smart-committer`.
 
-   Issues registradas em `.claude/tasks/<task-folder>/issues/` (issue-NNN.md a issue-MMM.md).
+**Do not ask the user for confirmation between loop iterations.** The loop is autonomous and terminates only when validation is clean or when a finding cannot be resolved automatically (e.g., requires external input or an architectural decision beyond the agent's authority). In that case, stop and report the specific blocker to the user.
 
-   Corrija as issues antes de rodar `/commit` novamente. Use `/resolve-issues` para corrigir.
+#### If only Warnings or Suggestions are found:
 
-   **Resumo dos problemas:**
-   - [CRITICAL/HIGH] File:line — Short description
-   - ...
-   ```
+- Report them briefly to the user.
+- **Do NOT invoke `/log-issue`** — warnings are not persisted automatically.
+- Continue to the next step.
 
-### If only Warnings or Suggestions are found:
+#### If no issues are found:
 
-- Report them briefly to the user
-- **Do NOT invoke `/log-issue`** — warnings are not persisted automatically
-- Continue to the next step
-
-### If no issues are found:
-
-- Report success and continue to the next step
+- Report success and continue to the next step.
 
 ## Severity Classification
 
@@ -166,7 +158,7 @@ The `knowledge-refiner` agent will read the retrospectives and update `.claude/r
 5. **Summarize at end** — Show what was accomplished (or blocked)
 6. **Never add AI/model co-author trailers** — Commit messages must not include `Co-Authored-By:` lines naming Claude, ChatGPT, GPT, an AI model, an AI vendor, a bot, or an assistant tool. Verify the exact message before committing and inspect the created commit body afterward.
 
-## Example: Blocked By Validation
+## Example: Auto-resolution loop
 
 ```
 ### Step 1/5: Format & Lint
@@ -179,22 +171,19 @@ Running npm run test:full...
 
 ### Step 3/5: Architecture Validation
 Running architecture-validator...
-
 ⛔ 2 critical violations found.
 
 [invoking /log-issue → creates issue-001.md, issue-002.md]
+[invoking /resolve-issues → software-engineer fixes both issues]
 
-## ⛔ Commit interrompido
+### Loop iteration 2 — re-running full validation
+Running npm run check... ✅
+Running npm run test:full... ✅
+Running architecture-validator... ✅ No violations.
+Running security-auditor... ✅ No critical issues.
 
-Foram encontrados 2 problema(s) bloqueante(s) durante a validação de arquitetura.
-
-Issues registradas em `.claude/tasks/TASK-002-user-profile/issues/` (issue-001.md a issue-002.md).
-
-Corrija as issues antes de rodar `/commit` novamente. Use `/resolve-issues` para corrigir.
-
-**Resumo dos problemas:**
-- [CRITICAL] src/entrypoints/user/user.controller.ts:45 — Business logic in controller
-- [CRITICAL] src/repositories/user/user.repository.ts:12 — Missing import type for UserEntity
+### Step 5/5: Creating Commits
+Running smart-committer...
 ```
 
 ## Example: Successful Workflow

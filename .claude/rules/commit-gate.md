@@ -63,3 +63,7 @@ There is no "validate in CI instead" escape hatch. If `test:app:full` fails loca
 ## Blocking behavior
 
 Critical or High findings from `architecture-validator` or `security-auditor` must be logged with `/log-issue` and block the commit. The commit workflow stops until issues are resolved via `/resolve-issues`.
+
+## Pre-existing violations during a Release cut
+
+When a Commit + Release flow is triggered, the commit gate runs against every app included in the release scope — not only apps touched by the current task. Pre-existing architecture or security violations in an untouched app surface at this point and must be resolved before the release tag is created. This is expected and correct behavior: the gate does not distinguish between new and pre-existing findings. Do not skip or defer them; run `/resolve-issues` and re-validate before proceeding to the release tag.

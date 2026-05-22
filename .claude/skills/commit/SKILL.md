@@ -150,6 +150,19 @@ The root `knowledge-refiner` focuses on cross-app and coordination learnings —
 
 Wait for `knowledge-refiner` to complete before continuing.
 
+### 5b-i — Commit knowledge-refiner changes
+
+After `knowledge-refiner` completes, run `git diff --name-only` to check whether it modified any files (typically `.claude/rules/*.md`).
+
+If changes exist:
+1. Stage only the files modified by `knowledge-refiner` (files under `.claude/rules/` and any other root-level rules or config updated by the refiner).
+2. Create a commit with the message: `chore(rules): apply retrospective learnings from <task-id>` (replace `<task-id>` with the current task identifier, e.g. `TASK-001`).
+3. Record this commit hash in the done report.
+
+**Do not skip this commit.** Changes produced by `knowledge-refiner` are root-bucket files and must be included in the release history. Skipping this step causes `.claude/rules/` to diverge from the committed state and leaves unstaged changes that will contaminate the next commit.
+
+If `knowledge-refiner` made no changes, skip this sub-step silently.
+
 ---
 
 ## Step 6: Release
