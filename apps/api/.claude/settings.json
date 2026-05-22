@@ -19,8 +19,5 @@
       "Bash(rm -rf *)",
       "Bash(npm uninstall *)"
     ],
-    "additionalDirectories": [
-      "/home/jaykon/dev/my/genemunology-api/.claude/skills"
-    ]
   }
 }
